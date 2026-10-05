@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Random Cat</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, sans-serif;
+      background: #f5f1ea;
+      color: #222;
+    }
+    .app {
+      width: min(92vw, 700px);
+      text-align: center;
+      padding: 28px;
+    }
+    h1 { margin: 0 0 8px; font-size: 42px; }
+    p { margin: 0 0 22px; color: #666; }
+    .card {
+      background: white;
+      padding: 14px;
+      border-radius: 20px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.12);
+    }
+    #cat {
+      display: block;
+      width: 100%;
+      height: min(60vh, 520px);
+      object-fit: cover;
+      border-radius: 14px;
+      background: #eee;
+    }
+    button {
+      margin-top: 18px;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #222;
+      color: white;
+    }
+    button:disabled { opacity: .55; cursor: wait; }
+    #status { min-height: 22px; margin-top: 12px; color: #777; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>🐱 Random Cat</h1>
+    <p>Need a cat? Get a cat.</p>
+
+    <div class="card">
+      <img id="cat" alt="Random cat" />
+    </div>
+
+    <button id="newCat">New Cat 🐾</button>
+    <div id="status"></div>
+  </main>
+
+  <script>
+    const cat = document.getElementById("cat");
+    const button = document.getElementById("newCat");
+    const status = document.getElementById("status");
+
+    async function getCat() {
+      button.disabled = true;
+      status.textContent = "Finding a cat...";
+
+      try {
+        const response = await fetch("https://api.thecatapi.com/v1/images/search");
+        if (!response.ok) throw new Error("Request failed");
+
+        const data = await response.json();
+        if (!data[0]?.url) throw new Error("No image returned");
+
+        cat.src = data[0].url;
+        status.textContent = "";
+      } catch (error) {
+        status.textContent = "Couldn't find a cat. Try again.";
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener("click", getCat);
+    getCat();
+  </script>
+</body>
+</html>
